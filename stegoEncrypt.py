@@ -138,5 +138,6 @@ password_entry.pack(pady=5)
 hide_button = tk.Button(root, text="Hide Secret 🔐", font=("Arial", 12), command=hide_secret)
 hide_button.pack(pady=20)
 
-# ---- Run the App ----
+# ---- Run the App -----------
 root.mainloop()
+#poop

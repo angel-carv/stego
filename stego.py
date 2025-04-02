@@ -212,3 +212,7 @@ tk.Button(reveal_tab, text="Reveal Secret 🔍", font=("Arial", 12), command=run
 
 # ---- Run App ----
 root.mainloop()
+
+#poopy butt 69
+
+# this is something 
