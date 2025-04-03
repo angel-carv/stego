@@ -6,14 +6,14 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import os
 
-# ---- AES Encryption Function ---- ---
+# ---- AES Encryption Function ---- --- ---
 def encrypt_message(message, password):
     # convert secret message to bytes
     data = message.encode()
     # generate salt and use PBKDF2 to derive key from password
     salt = get_random_bytes(16)
     key = PBKDF2(password, salt, dkLen=32, count=100_000)
-    # generate a random initialization vector
+    # generate a random initialization vector.
     iv = get_random_bytes(16)
 
     # adds \x0- ( - being the number of padding added) \x03 for example.
