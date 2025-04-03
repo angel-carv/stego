@@ -6,7 +6,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import os
 
-# ---- AES Encryption Function ----
+# ---- AES Encryption Function ---- ---
 def encrypt_message(message, password):
     # convert secret message to bytes
     data = message.encode()
@@ -26,7 +26,7 @@ def encrypt_message(message, password):
     # return all data needed to decrypt
     return salt + iv + ciphertext
 
-# ---- AES Decryption Function ----
+# ---- AES Decryption Function -----
 def decrypt_message(data, password):
     # extract components
     salt = data[:16]
