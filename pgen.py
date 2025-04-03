@@ -12,14 +12,14 @@ uppercase = string.ascii_uppercase
 specials = "!@#$%^&*"
 numbers = list(str(i) for i in range(10))
 
-#validChars = list(lowercase + uppercase + specials + numbers)
-#print(validChars)
+validChars = list(lowercase + uppercase + specials + numbers)
+print(validChars)
     
 
 
 
 
-#ef generatePass():
+def generatePass():
     
 
     
