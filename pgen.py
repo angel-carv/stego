@@ -12,7 +12,7 @@ uppercase = string.ascii_uppercase
 specials = "!@#$%^&*"
 numbers = list(str(i) for i in range(10))
 
-validChars = list(lowercase + uppercase + specials + numbers)
+validChars = list(lowercase + uppercase + specials) + numbers
 print(validChars)
     
 
@@ -31,13 +31,13 @@ print(validChars)
 
 
 
-#welcome = tk.Label(root, text="Generate a password" )
-#welcome.pack(pady=10)
-#testEntry = ttk.Entry(root , width= 50)
-#testEntry.pack(pady=20)
+welcome = tk.Label(root, text="Generate a password" )
+welcome.pack(pady=10)
+testEntry = ttk.Entry(root , width= 50)
+testEntry.pack(pady=20)
 
-#goButton = ttk.Button(root, text="Generate 0:")
-#goButton.pack(pady= 15)
+goButton = ttk.Button(root, text="Generate 0:")
+goButton.pack(pady= 15)
 
-#root.mainloop()
+root.mainloop()
 
