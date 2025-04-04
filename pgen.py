@@ -19,24 +19,25 @@ print(validChars)
 
 
 
-def generatePass():
-    
+#def generatePass():
 
     
 
+    
 
 
 
 
 
 
-welcome = tk.Label(root, text="Generate a password" )
-welcome.pack(pady=10)
-testEntry = ttk.Entry(root , width= 50)
-testEntry.pack(pady=20)
 
-goButton = ttk.Button(root, text="Generate 0:")
-goButton.pack(pady= 15)
+#welcome = tk.Label(root, text="Generate a password" )
+#welcome.pack(pady=10)
+#testEntry = ttk.Entry(root , width= 50)
+#testEntry.pack(pady=20)
 
-root.mainloop()
+#goButton = ttk.Button(root, text="Generate 0:")
+#goButton.pack(pady= 15)
+
+#root.mainloop()
 
