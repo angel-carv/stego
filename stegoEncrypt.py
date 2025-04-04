@@ -26,10 +26,14 @@ def encrypt_message(message, password):
     iv = get_random_bytes(16)
 
     # adds \x0- ( - being the number of padding added) \x03 for example.
+    #len returns num bytes. 
+    #bytes = [5] * 5 = \x05\x05\x05\x05\x05
     pad_len = 16 - (len(data) % 16)
     padded_data = data + bytes([pad_len] * pad_len)
 
     # encrypt with AES in CBC mode
+    #encrypts in 16 byte blocks in CBC mode which is linear and chains 
+    #like a linked list. 
     cipher = AES.new(key, AES.MODE_CBC, iv)
     ciphertext = cipher.encrypt(padded_data)
     # return all data needed to decrypt
@@ -38,24 +42,50 @@ def encrypt_message(message, password):
 # ---- LSB Embedding Function ----
 def embed_data_in_image(image_path, data, output_path):
     # open image and convert to RGB
+    #image.open returns PIL image object. 
+    #full of data of the image. 
+    #convert to (r,g,b) to not crash
+    #getdata() returns[(255,255,255), (120,10,4), etc..]
     img = Image.open(image_path)
     img = img.convert("RGB")
     pixels = list(img.getdata())
 
-    # convert our secret into bits
+# convert text into bits
+#data_with_length to do sequential LSB embedding. 
+#tells it how much is going to be encrypted data. 
+
+#data length tells num bytes in encrypted data. 
+#datalength is a byte object. 
+#Converts number into two bytes(big-endian)
+#telling it where to start and where to stop. 
+#2 big endian has max of 64 kb. for reference. 
+#bits creates
+#data with length looks like [0,192,10]
+#it's an immutable array of ints
+#byte:08b converts each element in the array(the bytes) into binary. for each byte
+#in the array. 
+#+ 2 to account for integer division errors. 
+
+    data_length = len(data)
+    data_with_length = data_length.to_bytes(2,'big') + data
     bits = ''.join(f'{byte:08b}' for byte in data)
     required_pixels = (len(bits) + 2) // 3  # Each pixel can store 3 bits
 
-    # make sure the image has enough space
+# make sure the image has enough space
     if required_pixels > len(pixels):
         raise ValueError("Image too small for this data.")
-
+#new modified pixels list.
     new_pixels = []
     bit_index = 0
 
-    # loops through each r g & b
-    # if r g or b data = 0 its overwritten by an encrypted bit from our bitstream.
-    # spread throughout entire picture
+# loops through each of cour original pictures pixels
+#if there are still pixels to be hidden...
+#rbg = pixel is (23,4,5) = (r,g,b)
+#~1 does compliment of 1 and changes lsb of r to 0.
+#next part is just embedding new data into that bit 
+#each line is saying r = cleanLSB(r) + insertNewBit(bit) 
+#it is doing this bitwise not logic wise. 
+#is the last bit 1? no ? okay embed the new data. 
     for pixel in pixels:
         if bit_index < len(bits):
             r, g, b = pixel
