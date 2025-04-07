@@ -5,6 +5,8 @@ from PIL import Image
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import os
+import string
+import secrets
 
 # ---- AES Encryption Function ---- --- ---
 def encrypt_message(message, password):
@@ -108,7 +110,7 @@ def extract_lsb_data(image_path):
 # ---- App GUI Setup ----
 root = tk.Tk()
 root.title("StegoVault")
-root.geometry("600x500")
+root.geometry("800x500")
 root.resizable(False, False)
 
 notebook = ttk.Notebook(root)
@@ -210,6 +212,57 @@ tk.Checkbutton(reveal_tab, text="Save to text file", variable=reveal_save_var).p
 
 tk.Button(reveal_tab, text="Reveal Secret 🔍", font=("Arial", 12), command=run_reveal).pack(pady=20)
 
+
+
+
+
+#-------------Password Generator gui-------------------
+password_tab = ttk.Frame(notebook)
+notebook.add(password_tab, text="Generate a password :D ")
+#---------------Generate a password-----------------------
+pLength = 15
+lowercase = string.ascii_lowercase
+uppercase = string.ascii_uppercase
+specials = "!@#$%^&*"
+numbers = list(str(i) for i in range(10))
+
+validChars = list(lowercase + uppercase + specials) + numbers
+    
+def genPassword():
+    return ''.join(secrets.choice(validChars) for _ in range(pLength))
+
+
+def showPassword():
+    password = genPassword()
+    passwordLabel.config(text=password)
+    copiedLabel.config(text="")  # clear old "Copied!" message  
+
+def copyToClipboard():
+    password = passwordLabel.cget("text")  # get current label text
+    if password:
+        password_tab.clipboard_clear()
+        password_tab.clipboard_append(password)
+        copiedLabel.config(text="Copied to clipboard!")
+    else:
+        copiedLabel.config(text="No password to copy.")
+
+
+
+welcome = tk.Label(password_tab, text="Generate a password" )
+welcome.pack(pady=10)
+
+goButton = ttk.Button(password_tab, text="Generate :D", command=showPassword)
+goButton.pack(pady= 15)
+
+passwordLabel = tk.Label(password_tab, text="", font=("Courier", 16), fg="green")
+passwordLabel.pack(pady=10)
+
+
+copyButton = ttk.Button(password_tab, text="Copy Password", command=copyToClipboard)
+copyButton.pack(pady=5)
+
+copiedLabel = tk.Label(password_tab, text="", font=("Helvetica", 10), fg="blue")
+copiedLabel.pack(pady=5)
 # ---- Run App ----
 root.mainloop()
 
