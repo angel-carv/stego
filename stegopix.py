@@ -108,7 +108,7 @@ def run_hide():
     password = password_entry.get()
 
     if not secret or not password:
-        messagebox.showwarning("⚠️", "Secret and password required.")
+        messagebox.showwarning("⚠️", "Secret and password requirepd.")
         return
 
     try:
@@ -136,6 +136,8 @@ password_entry = tk.Entry(hide_tab, show="*", width=50)
 password_entry.pack(pady=5)
 
 tk.Button(hide_tab, text="Hide Secret", font=("Arial", 12), command=run_hide).pack(pady=20)
+
+tk.Label(hide_tab, text="This will create a new photo with data hidden in it",fg="blue",  font=("Arial", 10)).pack(pady=1)
 
 # ---- Tab 2: Reveal Secret ----
 reveal_tab = ttk.Frame(notebook)
