@@ -5,7 +5,6 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 import os
 
-# ---- AES Decryption from LSB ----
 def extract_lsb_data(image_path, num_bytes):
     img = Image.open(image_path)
     img = img.convert("RGB")
@@ -40,13 +39,13 @@ def decrypt_message_from_image(image_path, password):
     pad_len = padded_plaintext[-1]
     return padded_plaintext[:-pad_len].decode(errors="replace")
 
-# ---- GUI Setup ----
+#gui set up
 root = tk.Tk()
 root.title("StegoVault Viewer")
 root.geometry("500x400")
 root.resizable(False, False)
 
-# ---- Decrypt Function ----
+#decrypt function
 def reveal_secret():
     image_path = filedialog.askopenfilename(
         title="🖼️ Select Image with Secret",
@@ -75,7 +74,7 @@ def reveal_secret():
     except Exception as e:
         messagebox.showerror("❌ Error", f"Failed to reveal secret: {e}")
 
-# ---- GUI Layout ----
+#gui layout
 welcome_label = tk.Label(root, text="🔐 StegoVault Viewer", font=("Arial", 16))
 welcome_label.pack(pady=20)
 
@@ -92,5 +91,5 @@ save_checkbox.pack(pady=10)
 reveal_button = tk.Button(root, text="Reveal Secret 🔍", font=("Arial", 12), command=reveal_secret)
 reveal_button.pack(pady=20)
 
-# ---- Run the App ----
+#run
 root.mainloop()
