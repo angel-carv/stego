@@ -15,6 +15,12 @@ root.resizable(False, False)
 # ---- Global Variables ----
 selected_file = None
 
+
+
+
+
+
+
 # ---- AES Encryption Function ----
 def encrypt_message(message, password):
     # convert secret message to bytes
@@ -38,6 +44,14 @@ def encrypt_message(message, password):
     ciphertext = cipher.encrypt(padded_data)
     # return all data needed to decrypt
     return salt + iv + ciphertext
+
+
+
+
+
+
+
+
 
 # ---- LSB Embedding Function ----
 def embed_data_in_image(image_path, data, output_path):
@@ -101,6 +115,12 @@ def embed_data_in_image(image_path, data, output_path):
     new_img = Image.new(img.mode, img.size)
     new_img.putdata(new_pixels)
     new_img.save(output_path)
+    
+    
+    
+    
+    
+    
 
 # ---- File Picker ----
 def pick_image():
@@ -119,6 +139,14 @@ def pick_image():
     selected_file = file_path
     filename = os.path.basename(file_path)
     filename_label.config(text=f"📄 Selected: {filename}")
+
+
+
+
+
+
+
+
 
 # ---- Hide Secret ----
 def hide_secret():
@@ -142,6 +170,12 @@ def hide_secret():
         messagebox.showinfo("✅ Success", f"Secret hidden successfully!\nSaved to: {output_path}")
     except Exception as e:
         messagebox.showerror("❌ Error", f"Failed to hide secret: {e}")
+        
+        
+        
+        
+        
+        
 
 # ---- GUI Layout ----
 welcome_label = tk.Label(root, text="🔐 Welcome to StegoVault Maker", font=("Arial", 16))
@@ -167,6 +201,11 @@ password_entry.pack(pady=5)
 
 hide_button = tk.Button(root, text="Hide Secret 🔐", font=("Arial", 12), command=hide_secret)
 hide_button.pack(pady=20)
+
+
+
+
+
 
 # ---- Run the App -----------
 root.mainloop()

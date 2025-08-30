@@ -10,3 +10,5 @@ if (Test-Path ".\dist\StegoPix.exe") {
 } else {
     Write-Host "❌ Build failed! Check the PyInstaller output for errors."
 }
+
+#to automatically make another build for windows. 

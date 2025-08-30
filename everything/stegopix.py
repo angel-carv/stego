@@ -8,6 +8,9 @@ import os
 import string
 import secrets
 
+#final build look at encrypt or viewer to see comments
+
+
 # ---- AES Encryption Function ----
 def encrypt_message(message, password):
     data = message.encode()
@@ -20,34 +23,135 @@ def encrypt_message(message, password):
     ciphertext = cipher.encrypt(padded_data)
     return salt + iv + ciphertext
 
-# ---- AES Decryption Function -----
-def decrypt_message(data, password):
-    salt = data[:16]
-    iv = data[16:32]
-    ciphertext = data[32:]
-    key = PBKDF2(password, salt, dkLen=32, count=100_000)
-    cipher = AES.new(key, AES.MODE_CBC, iv)
-    padded = cipher.decrypt(ciphertext)
-    pad_len = padded[-1]
-    return padded[:-pad_len].decode(errors="replace")
-
-# ---- LSB Embedding Function ----
-def embed_data_in_image(image_path, data, output_path):
-    data_length = len(data)
-    if data_length > 65535:
-        raise ValueError("Data too large to embed.")
-    data_with_length = data_length.to_bytes(2, 'big') + data
+# ---- Fixed LSB Extraction Function ----
+def extract_lsb_data(image_path):
+    """Extract data embedded using LSB steganography"""
+    if not os.path.exists(image_path):
+        raise FileNotFoundError("Image file not found")
+    
     img = Image.open(image_path).convert("RGB")
     pixels = list(img.getdata())
-    bits = ''.join(f'{byte:08b}' for byte in data_with_length)
-    required_pixels = (len(bits) + 2) // 3
-    if required_pixels > len(pixels):
-        raise ValueError("Image too small for this data.")
+    
+    # Extract all LSBs from the image
+    bits = []
+    for pixel in pixels:
+        for channel in pixel:
+            bits.append(str(channel & 1))  # Convert to string for joining
+    
+    # First 16 bits represent the length (2 bytes = 16 bits)
+    if len(bits) < 16:
+        raise ValueError("Image too small to contain embedded data")
+    
+    length_bits = bits[:16]
+    length = int("".join(length_bits), 2)
+    
+    if length == 0:
+        raise ValueError("No data found in image")
+    
+    if length > 65535:  # 2^16 - 1
+        raise ValueError("Invalid data length detected")
+    
+    # Calculate total bits needed: length bits + data bits
+    total_bits_needed = 16 + (length * 8)
+    
+    if len(bits) < total_bits_needed:
+        raise ValueError("Image doesn't contain enough data")
+    
+    # Extract the actual data bits
+    data_bits = bits[16:16 + (length * 8)]
+    
+    # Convert bits back to bytes
+    message_bytes = []
+    for i in range(0, len(data_bits), 8):
+        byte_bits = data_bits[i:i+8]
+        if len(byte_bits) == 8:  # Ensure we have a complete byte
+            byte_value = int("".join(byte_bits), 2)
+            message_bytes.append(byte_value)
+    
+    return bytes(message_bytes)
 
+# ---- Improved Decryption with Better Error Handling ----
+def decrypt_message(data, password):
+    """Decrypt AES encrypted data with better error detection"""
+    if len(data) < 32:  # Need at least salt + iv
+        raise ValueError("Data too short to be valid encrypted message")
+    
+    try:
+        salt = data[:16]
+        iv = data[16:32]
+        ciphertext = data[32:]
+        
+        if len(ciphertext) % 16 != 0:
+            raise ValueError("Invalid ciphertext length")
+        
+        key = PBKDF2(password, salt, dkLen=32, count=100_000)
+        cipher = AES.new(key, AES.MODE_CBC, iv)
+        padded = cipher.decrypt(ciphertext)
+        
+        if len(padded) == 0:
+            raise ValueError("Decryption failed")
+        
+        # Validate padding
+        pad_len = padded[-1]
+        if pad_len < 1 or pad_len > 16:
+            raise ValueError("Invalid padding or wrong password")
+        
+        # Check if all padding bytes are correct
+        for i in range(pad_len):
+            if padded[-(i+1)] != pad_len:
+                raise ValueError("Invalid padding or wrong password")
+        
+        # Remove padding and decode
+        message = padded[:-pad_len].decode('utf-8')
+        return message
+        
+    except UnicodeDecodeError:
+        raise ValueError("Decryption failed - wrong password or corrupted data")
+    except Exception as e:
+        raise ValueError(f"Decryption failed: {str(e)}")
+
+# ---- Input Validation for Embedding ----
+def embed_data_in_image(image_path, data, output_path):
+    """Embed data in image with better validation"""
+    # Input validation
+    if not os.path.exists(image_path):
+        raise FileNotFoundError("Source image not found")
+    
+    if len(data) == 0:
+        raise ValueError("No data to embed")
+    
+    data_length = len(data)
+    MAX_DATA_SIZE = 65535  # 2^16 - 1
+    
+    if data_length > MAX_DATA_SIZE:
+        raise ValueError(f"Data too large. Maximum size: {MAX_DATA_SIZE} bytes")
+    
+    # Prepare data with length prefix
+    data_with_length = data_length.to_bytes(2, 'big') + data
+    
+    try:
+        img = Image.open(image_path).convert("RGB")
+    except Exception as e:
+        raise ValueError(f"Cannot open image: {str(e)}")
+    
+    pixels = list(img.getdata())
+    
+    # Convert data to bits
+    bits = ''.join(f'{byte:08b}' for byte in data_with_length)
+    
+    # Check if image is large enough
+    required_pixels = (len(bits) + 2) // 3  # 3 bits per pixel (RGB)
+    if required_pixels > len(pixels):
+        raise ValueError(f"Image too small. Need {required_pixels} pixels, have {len(pixels)}")
+    
+    # Embed bits in LSBs
     new_pixels = []
     bit_index = 0
+    
     for pixel in pixels:
         r, g, b = pixel
+        
+        # Modify LSBs if we still have bits to embed
         if bit_index < len(bits):
             r = (r & ~1) | int(bits[bit_index])
             bit_index += 1
@@ -57,25 +161,17 @@ def embed_data_in_image(image_path, data, output_path):
         if bit_index < len(bits):
             b = (b & ~1) | int(bits[bit_index])
             bit_index += 1
+            
         new_pixels.append((r, g, b))
-
-    new_img = Image.new(img.mode, img.size)
-    new_img.putdata(new_pixels)
-    new_img.save(output_path)
-
-# ---- LSB Extraction Function ----
-def extract_lsb_data(image_path):
-    img = Image.open(image_path).convert("RGB")
-    pixels = list(img.getdata())
-    bits = []
-    for pixel in pixels:
-        for channel in pixel:
-            bits.append(channel & 1)
-    length_bits = bits[:16]
-    length = int("".join(map(str, length_bits)), 2)
-    data_bits = bits[16:16 + (length * 8)]
-    message_bytes = [int("".join(map(str, data_bits[i:i+8])), 2) for i in range(0, len(data_bits), 8)]
-    return bytes(message_bytes)
+    
+    # Create and save new image
+    try:
+        new_img = Image.new(img.mode, img.size)
+        new_img.putdata(new_pixels)
+        new_img.save(output_path, "PNG")  # Force PNG format
+        print(f"Successfully embedded {data_length} bytes in {output_path}")
+    except Exception as e:
+        raise ValueError(f"Cannot save image: {str(e)}")
 
 # ---- App GUI Setup ----
 root = tk.Tk()
