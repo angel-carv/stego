@@ -233,8 +233,23 @@ message_entry.pack(pady=5)
 password_label = tk.Label(root, text="🔑 Password:", font=("Arial", 12))
 password_label.pack(pady=(15, 5))
 
-password_entry = tk.Entry(root, width=40, show="*")  # show="*" hides password
-password_entry.pack(pady=5)
+# Password entry frame to hold entry and button together
+password_frame = tk.Frame(root)
+password_frame.pack(pady=5)
+
+password_entry = tk.Entry(password_frame, width=40, show="*")  # show="*" hides password
+password_entry.pack(side="left", padx=(0, 5))
+
+def toggle_password():
+    if password_entry.cget("show") == "*":
+        password_entry.config(show="")
+        toggle_btn.config(text="Hide")
+    else:
+        password_entry.config(show="*")
+        toggle_btn.config(text="Show")
+
+toggle_btn = tk.Button(password_frame, text="Show", command=toggle_password, width=5)
+toggle_btn.pack(side="left")
 
 # Button to start the hiding process
 hide_button = tk.Button(root, text="Hide Secret 🔐", font=("Arial", 12), command=hide_secret)

@@ -327,8 +327,24 @@ message_text = tk.Text(hide_tab, width=60, height=10, wrap="word")
 message_text.pack(pady=5)
 
 tk.Label(hide_tab, text="Password to retrieve data later", font=("Arial", 12)).pack(pady=(20, 5))
-password_entry = tk.Entry(hide_tab, show="*", width=50)
-password_entry.pack(pady=5)
+
+# Password entry frame to hold entry and button together
+password_frame = tk.Frame(hide_tab)
+password_frame.pack(pady=5)
+
+password_entry = tk.Entry(password_frame, show="*", width=50)
+password_entry.pack(side="left", padx=(0, 5))
+
+def toggle_hide_password():
+    if password_entry.cget("show") == "*":
+        password_entry.config(show="")
+        toggle_hide_btn.config(text="Hide")
+    else:
+        password_entry.config(show="*")
+        toggle_hide_btn.config(text="Show")
+
+toggle_hide_btn = tk.Button(password_frame, text="Show", command=toggle_hide_password, width=5)
+toggle_hide_btn.pack(side="left")
 
 tk.Button(hide_tab, text="Hide Secret", font=("Arial", 12), command=run_hide).pack(pady=20)
 
@@ -381,8 +397,24 @@ def run_reveal():
 
 # Reveal GUI Layout
 tk.Label(reveal_tab, text="Enter your password :b", font=("Arial", 12)).pack(pady=(30, 5))
-reveal_password_entry = tk.Entry(reveal_tab, width=50, show="*")
-reveal_password_entry.pack(pady=5)
+
+# Password entry frame for reveal tab
+reveal_password_frame = tk.Frame(reveal_tab)
+reveal_password_frame.pack(pady=5)
+
+reveal_password_entry = tk.Entry(reveal_password_frame, width=50, show="*")
+reveal_password_entry.pack(side="left", padx=(0, 5))
+
+def toggle_reveal_password():
+    if reveal_password_entry.cget("show") == "*":
+        reveal_password_entry.config(show="")
+        toggle_reveal_btn.config(text="Hide")
+    else:
+        reveal_password_entry.config(show="*")
+        toggle_reveal_btn.config(text="Show")
+
+toggle_reveal_btn = tk.Button(reveal_password_frame, text="Show", command=toggle_reveal_password, width=5)
+toggle_reveal_btn.pack(side="left")
 
 tk.Button(reveal_tab, text="Reveal Secret (:", font=("Arial", 12), command=run_reveal).pack(pady=10)
 
