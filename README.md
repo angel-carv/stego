@@ -121,6 +121,50 @@ python pgen.py
 - `stegoViewer.py`: Standalone tool for revealing messages
 - `pgen.py`: Standalone password generator
 
+## Lessons Learned
+### 1. Separation of Concerns
+* Split functionality into separate files (`stegoEncrypt.py`, `stegoViewer.py`, `pgen.py`) before combining into one unified app (`stego.py`)
+* This modular approach makes testing easier and lets users choose their preferred interface
+
+### 2. User Experience Decisions
+* The Show/Hide password toggle - small UX improvements matter
+* Giving users choices (popup vs. save to file, tabs for different functions)
+* Input validation before operations (checking file types, password presence)
+
+### 3. Data Flow
+* Clear pipeline: Input → Process → Output
+* Hide: Message → Encrypt → Embed → Save
+* Reveal: Load → Extract → Decrypt → Display
+* Each step can fail independently and be debugged separately
+
+### 4. Working with Binary Data
+* Converting between different formats (strings, bytes, bits)
+* Understanding data size constraints (2-byte length header = 65KB max)
+* Bitwise operations for LSB manipulation
+## Fun Facts!
+Steganography dates back to 440 B.C. in Greece! Documented by the historian Herodotus, Histiaeus was an ancient Greek tyrant who was being held as a political prisoner under house arrest by King Darius I of Persia.
+
+Histiaeus wanted to return home so he devised a plan that would make him famous in cryptography millennia later.
+
+Histiaeus selected his most trusted slave, tattooed a message on his scalp, and let his hair grow back before sending him to his son-in-law Aristagoras in Miletus. This message contained a plan to incite rebellion in his home city, Miletus, so that he could be sent to stop it.
+
+Essentially Histiaeus created a problem to position himself as the solution, as he was respected and had influence in Miletus that the Persians didn't have.
+
+### Historical Examples
+- **WWII Invisible Ink** - Spies wrote messages with lemon juice or milk between the lines of innocent letters. The hidden text only appeared when heated.
+- **Microdots** - During the Cold War, agents reduced entire photographs to the size of a period (.) and hid them in regular documents. You'd need a microscope to spot them!
+- **Null Ciphers** - Hidden messages created by taking specific letters from innocent-looking text. Example: "Can one decipher elegantly?" - first letters spell "CODE"
+- **Prison Communication** - Inmates have used pinpricks above certain letters in books, or written with bodily fluids visible only under UV light
+
+### Modern Examples
+- **LSB (Least Significant Bit) encoding** - Hiding data in image pixels by slightly altering color values imperceptible to the human eye (what this app uses!)
+- **Audio steganography** - Embedding messages in sound files by modifying frequencies we can't consciously hear
+- **Network steganography** - Hiding data in network packets or protocol headers during transmission
+- **Video steganography** - Concealing information across video frames in movies or streams
+- **Digital watermarking** - Companies embed invisible ownership information in photos, music, and videos
+
+## What is Steganography?
+Steganography is the practice of hiding secret messages in plain sight. Unlike encryption which scrambles a message, steganography conceals that a message even exists at all.
 ## License
 
 This project is provided as-is for educational and personal use.
